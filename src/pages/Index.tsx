@@ -108,7 +108,6 @@ const calculateDistanceKm = (source: string, destination: string) => {
 
 const Index = () => {
 	const [showOnboarding, setShowOnboarding] = useState<boolean>(() => !dbService.getHasSeenOnboardingSync());
-	const [showInstallGuide, setShowInstallGuide] = useState<boolean>(false);
 	const [draftPassenger, setDraftPassenger] = useState<PassengerDetails>(() =>
 		dbService.getDraftPassengerSync(initialPassenger),
 	);
@@ -277,10 +276,8 @@ const Index = () => {
 				}
 				setDeferredInstallPrompt(null);
 			} catch {
-				setShowInstallGuide(true);
+				// Ignore
 			}
-		} else {
-			setShowInstallGuide(true);
 		}
 	};
 
@@ -567,54 +564,6 @@ const Index = () => {
 					</Card>
 				</div>
 			</div>
-
-			{/* Install Guide Modal */}
-			<Dialog open={showInstallGuide} onOpenChange={setShowInstallGuide}>
-				<DialogContent className="left-1/2 top-[50%] w-[calc(100%-1rem)] max-w-sm translate-x-[-50%] translate-y-[-50%] rounded-[1.75rem] border-0 bg-white p-0 shadow-2xl focus:outline-none">
-					<div className="space-y-4 px-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-5 sm:px-6 sm:py-6 text-left">
-						<DialogHeader className="space-y-1.5 text-left">
-							<DialogTitle className="text-xl font-bold text-slate-900">How to Install App</DialogTitle>
-							<DialogDescription className="text-xs text-slate-500">
-								Follow these quick steps to add the app to your Home Screen for 100% offline use.
-							</DialogDescription>
-						</DialogHeader>
-
-						<div className="space-y-3">
-							{/* iPhone / iOS */}
-							<div className="rounded-2xl border border-slate-100 bg-slate-50 p-3.5 space-y-1.5">
-								<p className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-									<span>🍎 iPhone / iPad (Safari)</span>
-								</p>
-								<ol className="text-[12px] text-slate-600 space-y-1 list-decimal pl-4">
-									<li>Safari browser ke bottom me <strong>Share (📤)</strong> button dabayein.</li>
-									<li>Niche scroll karke <strong>"Add to Home Screen"</strong> select karein.</li>
-								</ol>
-							</div>
-
-							{/* Android */}
-							<div className="rounded-2xl border border-slate-100 bg-slate-50 p-3.5 space-y-1.5">
-								<p className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-									<span>🤖 Android (Chrome)</span>
-								</p>
-								<ol className="text-[12px] text-slate-600 space-y-1 list-decimal pl-4">
-									<li>Chrome me top-right <strong>3 dots (⋮)</strong> dabayein.</li>
-									<li><strong>"Install app"</strong> ya <strong>"Add to Home screen"</strong> select karein.</li>
-								</ol>
-							</div>
-						</div>
-
-						<DialogFooter className="pt-2">
-							<Button
-								type="button"
-								onClick={() => setShowInstallGuide(false)}
-								className="h-11 w-full rounded-full !bg-[#31a24c] !text-white text-xs font-semibold shadow-md hover:!bg-[#299043]"
-							>
-								Samajh Gaya
-							</Button>
-						</DialogFooter>
-					</div>
-				</DialogContent>
-			</Dialog>
 
 			<Dialog open={isTermsDialogOpen} onOpenChange={handleTermsDialogChange}>
 				<DialogContent className="left-1/2 top-auto bottom-0 w-[calc(100%-0.75rem)] max-w-sm translate-x-[-50%] translate-y-0 rounded-t-[1.75rem] rounded-b-none border-0 bg-white p-0 shadow-[0_-18px_45px_rgba(15,23,42,0.18)] sm:top-[50%] sm:bottom-auto sm:w-[calc(100%-1rem)] sm:max-w-sm sm:translate-y-[-50%] sm:rounded-[1.75rem] sm:shadow-[0_28px_70px_rgba(15,23,42,0.2)]">
