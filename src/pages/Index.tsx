@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
+import { HelpCircle } from "lucide-react";
 
 import BookingDetails, { generateTicketCode, type PassengerDetails } from "@/components/BookingDetails";
+import { OnboardingModal } from "@/components/OnboardingModal";
 import StationAutocomplete from "@/components/StationAutocomplete";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -77,7 +79,6 @@ const calculateDistanceKm = (source: string, destination: string) => {
 
 	if (!sourceStation || !destinationStation) {
 		if (!source.trim() || !destination.trim()) return null;
-		// Deterministic offline estimate between 30 and 450 km based on station names
 		let hash = 0;
 		const combined = normalizeStationName(source) + normalizeStationName(destination);
 		for (let i = 0; i < combined.length; i++) {
@@ -106,6 +107,7 @@ const calculateDistanceKm = (source: string, destination: string) => {
 };
 
 const Index = () => {
+	const [showOnboarding, setShowOnboarding] = useState<boolean>(() => !dbService.getHasSeenOnboardingSync());
 	const [draftPassenger, setDraftPassenger] = useState<PassengerDetails>(() =>
 		dbService.getDraftPassengerSync(initialPassenger),
 	);
@@ -123,6 +125,11 @@ const Index = () => {
 	const [isOnline, setIsOnline] = useState(() => (typeof navigator === "undefined" ? true : navigator.onLine));
 	const [deferredInstallPrompt, setDeferredInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
 	const [isAppInstalled, setIsAppInstalled] = useState(false);
+
+	const handleAcceptOnboarding = () => {
+		dbService.setHasSeenOnboarding(true);
+		setShowOnboarding(false);
+	};
 
 	// Async IndexedDB hydration check
 	useEffect(() => {
@@ -374,11 +381,18 @@ const Index = () => {
 
 	// Until user explicitly backs out, stay on ticket page permanently across reloads
 	if (ticketRecord) {
-		return <BookingDetails ticketRecord={ticketRecord} onEdit={handleBackoutFromTicket} />;
+		return (
+			<>
+				<OnboardingModal open={showOnboarding} onAccept={handleAcceptOnboarding} />
+				<BookingDetails ticketRecord={ticketRecord} onEdit={handleBackoutFromTicket} />
+			</>
+		);
 	}
 
 	return (
 		<>
+			<OnboardingModal open={showOnboarding} onAccept={handleAcceptOnboarding} />
+
 			<div className="min-h-screen bg-[#edf1f5] px-3 py-4 sm:px-5 sm:py-6">
 				<div className="mx-auto w-full max-w-md">
 					{deferredInstallPrompt && !isAppInstalled ? (
@@ -397,7 +411,17 @@ const Index = () => {
 					) : null}
 					<Card className="overflow-hidden border border-slate-200 bg-white shadow-[0_18px_45px_rgba(15,23,42,0.08)]">
 						<CardHeader className="space-y-2 border-b border-slate-100 px-4 py-4 text-left sm:px-5 sm:py-5">
-							<CardTitle className="text-[1.35rem] font-semibold leading-tight text-slate-900 sm:text-[1.6rem]">Enter Passenger Details</CardTitle>
+							<div className="flex items-center justify-between gap-2">
+								<CardTitle className="text-[1.35rem] font-semibold leading-tight text-slate-900 sm:text-[1.6rem]">Enter Passenger Details</CardTitle>
+								<button
+									type="button"
+									onClick={() => setShowOnboarding(true)}
+									className="rounded-full p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition"
+									title="App Guide & Terms"
+								>
+									<HelpCircle className="h-5 w-5" />
+								</button>
+							</div>
 							<CardDescription className="text-[13px] leading-relaxed text-slate-500 sm:text-sm">
 								Fill in the passenger and journey details. A password card will open after submission.
 							</CardDescription>

@@ -14,6 +14,7 @@ const STORE_NAME = "app_store";
 
 const DRAFT_PASSENGER_STORAGE_KEY = "local-ticket-draft-passenger";
 const TICKET_RECORD_STORAGE_KEY = "local-ticket-record";
+const ONBOARDING_STORAGE_KEY = "local-ticket-onboarding-seen";
 const DRAFT_PASSENGER_COOKIE_KEY = "local_ticket_draft_passenger";
 const TICKET_RECORD_COOKIE_KEY = "local_ticket_record";
 const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365 * 10;
@@ -191,6 +192,17 @@ export const dbService = {
 			readCookieJSON(DRAFT_PASSENGER_COOKIE_KEY, isPassengerDetails) ??
 			fallback
 		);
+	},
+
+	getHasSeenOnboardingSync(): boolean {
+		return (
+			readLocalStorageJSON(ONBOARDING_STORAGE_KEY, (v): v is boolean => typeof v === "boolean") ?? false
+		);
+	},
+
+	async setHasSeenOnboarding(seen: boolean): Promise<void> {
+		writeLocalStorageJSON(ONBOARDING_STORAGE_KEY, seen);
+		await idb.setItem(ONBOARDING_STORAGE_KEY, seen);
 	},
 
 	async saveTicketRecord(record: TicketRecord): Promise<void> {
