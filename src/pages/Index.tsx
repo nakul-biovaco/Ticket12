@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { HelpCircle } from "lucide-react";
+import { HelpCircle, Smartphone } from "lucide-react";
 
 import BookingDetails, { generateTicketCode, type PassengerDetails } from "@/components/BookingDetails";
 import { OnboardingModal } from "@/components/OnboardingModal";
@@ -108,6 +108,7 @@ const calculateDistanceKm = (source: string, destination: string) => {
 
 const Index = () => {
 	const [showOnboarding, setShowOnboarding] = useState<boolean>(() => !dbService.getHasSeenOnboardingSync());
+	const [showInstallGuide, setShowInstallGuide] = useState<boolean>(false);
 	const [draftPassenger, setDraftPassenger] = useState<PassengerDetails>(() =>
 		dbService.getDraftPassengerSync(initialPassenger),
 	);
@@ -267,10 +268,20 @@ const Index = () => {
 	}, [draftPassenger.source, draftPassenger.destination, isOnline]);
 
 	const handleInstallApp = async () => {
-		if (!deferredInstallPrompt) return;
-		await deferredInstallPrompt.prompt();
-		await deferredInstallPrompt.userChoice;
-		setDeferredInstallPrompt(null);
+		if (deferredInstallPrompt) {
+			try {
+				await deferredInstallPrompt.prompt();
+				const choice = await deferredInstallPrompt.userChoice;
+				if (choice.outcome === "accepted") {
+					setIsAppInstalled(true);
+				}
+				setDeferredInstallPrompt(null);
+			} catch {
+				setShowInstallGuide(true);
+			}
+		} else {
+			setShowInstallGuide(true);
+		}
 	};
 
 	const autoDistance = apiDistance ?? localAutoDistance;
@@ -395,20 +406,29 @@ const Index = () => {
 
 			<div className="min-h-screen bg-[#edf1f5] px-3 py-4 sm:px-5 sm:py-6">
 				<div className="mx-auto w-full max-w-md">
-					{deferredInstallPrompt && !isAppInstalled ? (
-						<div className="mb-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:mb-4 sm:p-3.5">
+					{!isAppInstalled && (
+						<div className="mb-3.5 rounded-2xl border border-emerald-200/80 bg-emerald-50/90 p-3 shadow-sm sm:mb-4 sm:p-3.5">
 							<div className="flex items-center justify-between gap-3">
-								<p className="text-xs font-medium text-slate-600 sm:text-sm">Install app for full offline use</p>
+								<div className="flex items-center gap-2.5">
+									<div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm shrink-0">
+										<Smartphone className="h-5 w-5" />
+									</div>
+									<div className="text-left">
+										<p className="text-xs font-bold text-emerald-950 sm:text-sm">Install App on Phone</p>
+										<p className="text-[11px] text-emerald-700">Use 100% offline anytime</p>
+									</div>
+								</div>
 								<Button
 									type="button"
 									onClick={handleInstallApp}
-									className="h-8 rounded-full !bg-[#31a24c] px-4 text-xs font-semibold text-white hover:!bg-[#299043] sm:h-9"
+									className="h-9 rounded-full !bg-[#31a24c] px-4 text-xs font-semibold text-white shadow-md hover:!bg-[#299043] active:scale-95 shrink-0"
 								>
 									Install
 								</Button>
 							</div>
 						</div>
-					) : null}
+					)}
+
 					<Card className="overflow-hidden border border-slate-200 bg-white shadow-[0_18px_45px_rgba(15,23,42,0.08)]">
 						<CardHeader className="space-y-2 border-b border-slate-100 px-4 py-4 text-left sm:px-5 sm:py-5">
 							<div className="flex items-center justify-between gap-2">
@@ -547,6 +567,54 @@ const Index = () => {
 					</Card>
 				</div>
 			</div>
+
+			{/* Install Guide Modal */}
+			<Dialog open={showInstallGuide} onOpenChange={setShowInstallGuide}>
+				<DialogContent className="left-1/2 top-[50%] w-[calc(100%-1rem)] max-w-sm translate-x-[-50%] translate-y-[-50%] rounded-[1.75rem] border-0 bg-white p-0 shadow-2xl focus:outline-none">
+					<div className="space-y-4 px-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-5 sm:px-6 sm:py-6 text-left">
+						<DialogHeader className="space-y-1.5 text-left">
+							<DialogTitle className="text-xl font-bold text-slate-900">How to Install App</DialogTitle>
+							<DialogDescription className="text-xs text-slate-500">
+								Follow these quick steps to add the app to your Home Screen for 100% offline use.
+							</DialogDescription>
+						</DialogHeader>
+
+						<div className="space-y-3">
+							{/* iPhone / iOS */}
+							<div className="rounded-2xl border border-slate-100 bg-slate-50 p-3.5 space-y-1.5">
+								<p className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+									<span>🍎 iPhone / iPad (Safari)</span>
+								</p>
+								<ol className="text-[12px] text-slate-600 space-y-1 list-decimal pl-4">
+									<li>Safari browser ke bottom me <strong>Share (📤)</strong> button dabayein.</li>
+									<li>Niche scroll karke <strong>"Add to Home Screen"</strong> select karein.</li>
+								</ol>
+							</div>
+
+							{/* Android */}
+							<div className="rounded-2xl border border-slate-100 bg-slate-50 p-3.5 space-y-1.5">
+								<p className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+									<span>🤖 Android (Chrome)</span>
+								</p>
+								<ol className="text-[12px] text-slate-600 space-y-1 list-decimal pl-4">
+									<li>Chrome me top-right <strong>3 dots (⋮)</strong> dabayein.</li>
+									<li><strong>"Install app"</strong> ya <strong>"Add to Home screen"</strong> select karein.</li>
+								</ol>
+							</div>
+						</div>
+
+						<DialogFooter className="pt-2">
+							<Button
+								type="button"
+								onClick={() => setShowInstallGuide(false)}
+								className="h-11 w-full rounded-full !bg-[#31a24c] !text-white text-xs font-semibold shadow-md hover:!bg-[#299043]"
+							>
+								Samajh Gaya
+							</Button>
+						</DialogFooter>
+					</div>
+				</DialogContent>
+			</Dialog>
 
 			<Dialog open={isTermsDialogOpen} onOpenChange={handleTermsDialogChange}>
 				<DialogContent className="left-1/2 top-auto bottom-0 w-[calc(100%-0.75rem)] max-w-sm translate-x-[-50%] translate-y-0 rounded-t-[1.75rem] rounded-b-none border-0 bg-white p-0 shadow-[0_-18px_45px_rgba(15,23,42,0.18)] sm:top-[50%] sm:bottom-auto sm:w-[calc(100%-1rem)] sm:max-w-sm sm:translate-y-[-50%] sm:rounded-[1.75rem] sm:shadow-[0_28px_70px_rgba(15,23,42,0.2)]">
