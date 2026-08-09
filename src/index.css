@@ -1,0 +1,245 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    /* UTS brand blue */
+    --primary: 217 91% 53%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 210 20% 94%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 31% 91%;
+    --input: 214 31% 91%;
+    --ring: 217 91% 53%;
+
+    --radius: 0.75rem;
+
+    /* Ticket specific */
+    --ticket-bg: 210 17% 93%;
+    --ticket-card: 0 0% 100%;
+    --ticket-dark: 0 0% 8%;
+    --ticket-orange: 18 100% 55%;
+    --ticket-amber: 38 100% 55%;
+    --ticket-green: 88 50% 75%;
+    --note-bg: 0 75% 95%;
+    --note-text: 0 75% 50%;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5% 26%;
+    --sidebar-primary: 240 6% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 5% 96%;
+    --sidebar-accent-foreground: 240 6% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217 91% 60%;
+  }
+
+  .dark {
+    --background: 222 47% 6%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 6%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 6%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 213 27% 84%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+}
+
+@layer components {
+  /* Diamond / harlequin pattern for the dynamic ticket */
+  .diamond-pattern {
+    background-color: hsl(var(--ticket-dark));
+    background-image:
+      linear-gradient(45deg, hsla(0, 0%, 100%, 0.04) 25%, transparent 25%),
+      linear-gradient(-45deg, hsla(0, 0%, 100%, 0.04) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, hsla(0, 0%, 100%, 0.04) 75%),
+      linear-gradient(-45deg, transparent 75%, hsla(0, 0%, 100%, 0.04) 75%);
+    background-size: 28px 28px;
+    background-position: 0 0, 0 14px, 14px -14px, -14px 0;
+  }
+
+  /* Ticket notch using radial gradient on sides — uses CSS var so we can change cutout color */
+  .ticket-notch {
+    --notch-bg: hsl(var(--ticket-card));
+    --cut-size: clamp(1.75rem, 5.4vw, 2.15rem);
+    background-color: var(--notch-bg);
+    height: clamp(1.8rem, 5.8vw, 2.2rem);
+    position: relative;
+    overflow: hidden;
+  }
+  .ticket-notch::before,
+  .ticket-notch::after {
+    content: "";
+    position: absolute;
+    left: clamp(3rem, 10vw, 4.25rem);
+    right: clamp(3rem, 10vw, 4.25rem);
+    top: 50%;
+    width: var(--cut-size);
+    height: var(--cut-size);
+    border-radius: 9999px;
+    background: hsl(var(--ticket-bg));
+    transform: translateY(-50%);
+  }
+  .ticket-notch::before {
+    left: calc(var(--cut-size) / -2);
+    right: auto;
+  }
+  .ticket-notch::after {
+    right: calc(var(--cut-size) / -2);
+    left: auto;
+  }
+  .ticket-notch-line {
+    position: absolute;
+    left: calc(var(--cut-size) / 2);
+    right: calc(var(--cut-size) / 2);
+    top: 54%;
+    border-top: 1.5px dashed hsl(var(--muted-foreground) / 0.4);
+    transform: translateY(-50%);
+    z-index: 1;
+  }
+  /* Variant where the surrounding background is the page grey */
+  .ticket-notch-grey {
+    --notch-bg: hsl(var(--ticket-card));
+    background-color: hsl(var(--ticket-card));
+  }
+
+  .rail-vertical {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+  }
+
+  .rail-vertical-hindi {
+    transform: none;
+  }
+
+  .time-roll-window {
+    position: relative;
+    display: inline-flex;
+    align-items: flex-start;
+    justify-content: center;
+    overflow: hidden;
+    height: 1em;
+    line-height: 1;
+    contain: content;
+    perspective: 600px;
+  }
+
+  .time-roll-track {
+    display: flex;
+    flex-direction: column;
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+  }
+
+  .time-roll-track--animate {
+    transform: translate3d(0, 0, 0);
+    animation: time-roll-flip 600ms cubic-bezier(0.4, 0.0, 0.2, 1) both;
+  }
+
+  .time-roll-value {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 1em;
+    line-height: 1;
+    backface-visibility: hidden;
+    will-change: transform, opacity, filter;
+  }
+
+  .time-roll-colon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transform: translateY(-0.02em);
+  }
+
+  @keyframes time-roll-flip {
+    0% {
+      transform: translate3d(0, -100%, 0);
+    }
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  .time-roll-track--animate .time-roll-value:first-child {
+    animation: time-roll-fade-in 600ms cubic-bezier(0.4, 0.0, 0.2, 1) both;
+  }
+
+  .time-roll-track--animate .time-roll-value:last-child {
+    animation: time-roll-fade-out 600ms cubic-bezier(0.4, 0.0, 0.2, 1) both;
+  }
+
+  @keyframes time-roll-fade-in {
+    0% {
+      opacity: 0.35;
+      filter: blur(1.5px);
+    }
+    60% {
+      opacity: 1;
+      filter: blur(0);
+    }
+    100% {
+      opacity: 1;
+      filter: blur(0);
+    }
+  }
+
+  @keyframes time-roll-fade-out {
+    0% {
+      opacity: 1;
+      filter: blur(0);
+    }
+    100% {
+      opacity: 0.4;
+      filter: blur(1.5px);
+    }
+  }
+}
