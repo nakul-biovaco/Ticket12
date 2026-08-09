@@ -119,10 +119,10 @@ const BookingDetails = ({ ticketRecord, onEdit }: BookingDetailsProps) => {
   }, [displayTime.animateMm, displayTime.animateSs]);
 
   const bookedOnDate = new Date(ticketRecord.bookedOnTimestamp);
+  bookedOnDate.setDate(bookedOnDate.getDate() - 2);
   const bookedOn = `${String(bookedOnDate.getDate()).padStart(2, "0")}/${String(bookedOnDate.getMonth() + 1).padStart(2, "0")}/${bookedOnDate.getFullYear()} ${String(bookedOnDate.getHours()).padStart(2, "0")}:${String(bookedOnDate.getMinutes()).padStart(2, "0")}`;
 
   const validFromDate = new Date(bookedOnDate);
-  validFromDate.setDate(validFromDate.getDate() - 2);
   const validFrom = `${String(validFromDate.getDate()).padStart(2, "0")}/${String(validFromDate.getMonth() + 1).padStart(2, "0")}/${validFromDate.getFullYear()}`;
 
   const validTillDate = new Date(bookedOnDate);
