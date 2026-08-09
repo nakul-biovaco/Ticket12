@@ -118,30 +118,15 @@ const BookingDetails = ({ ticketRecord, onEdit }: BookingDetailsProps) => {
     return () => window.clearTimeout(timeout);
   }, [displayTime.animateMm, displayTime.animateSs]);
 
-  // Unlimited Dynamic Rolling Date: Always relative to today's current date
-  const now = new Date();
-  const savedTime = new Date(ticketRecord.bookedOnTimestamp || Date.now());
-
-  // Today's date with preserved booking time
-  const todayWithTime = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-    savedTime.getHours(),
-    savedTime.getMinutes(),
-    savedTime.getSeconds()
-  );
-
-  // Booked On = Today - 2 days
-  const bookedOnDate = new Date(todayWithTime);
+  const today = new Date();
+  const bookedOnDate = new Date(today);
   bookedOnDate.setDate(bookedOnDate.getDate() - 2);
-  const bookedOn = `${String(bookedOnDate.getDate()).padStart(2, "0")}/${String(bookedOnDate.getMonth() + 1).padStart(2, "0")}/${bookedOnDate.getFullYear()} ${String(bookedOnDate.getHours()).padStart(2, "0")}:${String(bookedOnDate.getMinutes()).padStart(2, "0")}`;
+  const bookedOn = `${String(bookedOnDate.getDate()).padStart(2, "0")}/${String(bookedOnDate.getMonth() + 1).padStart(2, "0")}/${bookedOnDate.getFullYear()} 14:30`;
 
-  // Valid From = Booked On date
-  const validFromDate = new Date(bookedOnDate);
+  const validFromDate = new Date(today);
+  validFromDate.setDate(validFromDate.getDate() - 2);
   const validFrom = `${String(validFromDate.getDate()).padStart(2, "0")}/${String(validFromDate.getMonth() + 1).padStart(2, "0")}/${validFromDate.getFullYear()}`;
 
-  // Valid Till = Booked On date + 1 month - 1 day
   const validTillDate = new Date(bookedOnDate);
   validTillDate.setMonth(validTillDate.getMonth() + 1);
   validTillDate.setDate(validTillDate.getDate() - 1);
