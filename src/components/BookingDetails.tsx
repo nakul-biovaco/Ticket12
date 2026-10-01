@@ -26,16 +26,16 @@ type TextPosition = {
 };
 
 const TIMER_DURATION = 300;
-const TIME_ROLL_DURATION_MS = 600;
+const TIME_ROLL_DURATION_MS = 800;
 
 export const generateTicketCode = () => {
-  const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ";
-  const l1 = letters[Math.floor(Math.random() * letters.length)];
-  const l2 = letters[Math.floor(Math.random() * letters.length)];
-  const l3 = letters[Math.floor(Math.random() * letters.length)];
-  const l4 = letters[Math.floor(Math.random() * letters.length)];
-  const num = String(Math.floor(Math.random() * 900) + 100);
-  return `${l1}${l2}${l3}${l4}${num}`;
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let result = "";
+  for (let i = 0; i < 6; i++) {
+    result += letters[Math.floor(Math.random() * letters.length)];
+  }
+  const num = Math.floor(Math.random() * 9000) + 1000;
+  return `${result}${num}`;
 };
 
 const BookingDetails = ({ ticketRecord, onEdit }: BookingDetailsProps) => {
@@ -118,10 +118,13 @@ const BookingDetails = ({ ticketRecord, onEdit }: BookingDetailsProps) => {
     return () => window.clearTimeout(timeout);
   }, [displayTime.animateMm, displayTime.animateSs]);
 
+  const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
   const today = new Date();
   const bookedOnDate = new Date(today);
   bookedOnDate.setDate(bookedOnDate.getDate() - 2);
-  const bookedOn = `${String(bookedOnDate.getDate()).padStart(2, "0")}/${String(bookedOnDate.getMonth() + 1).padStart(2, "0")}/${bookedOnDate.getFullYear()} 14:30`;
+  const bookedOnDisplay = `${String(bookedOnDate.getDate()).padStart(2, "0")} ${MONTH_NAMES[bookedOnDate.getMonth()]} ${bookedOnDate.getFullYear()}, 06:28`;
+  const bookedOn = `${String(bookedOnDate.getDate()).padStart(2, "0")}/${String(bookedOnDate.getMonth() + 1).padStart(2, "0")}/${bookedOnDate.getFullYear()} 06:28:00`;
 
   const validFromDate = new Date(today);
   validFromDate.setDate(validFromDate.getDate() - 2);
@@ -164,7 +167,7 @@ const BookingDetails = ({ ticketRecord, onEdit }: BookingDetailsProps) => {
   const EditableField = ({ field, value }: { field: string; value: string }) => {
     const pos = positions[field] || { x: 0, y: 0 };
     if (!isEditMode) {
-      return <span onClick={() => setEditingField(field)} className="cursor-pointer hover:bg-yellow-100/50 px-1 rounded transition">{value}</span>;
+      return <span>{value}</span>;
     }
     if (editingField === field) {
       return (
@@ -332,7 +335,7 @@ const BookingDetails = ({ ticketRecord, onEdit }: BookingDetailsProps) => {
               <p className="text-[clamp(0.88rem,3.4vw,1rem)] font-semibold mb-[clamp(0.35rem,1.5vw,0.55rem)]">Dynamic preview will close in</p>
               <p
                 aria-label={`${mm}:${ss}`}
-                className="flex items-center justify-center gap-[0.04em] text-[clamp(2.45rem,10.5vw,3.5rem)] leading-none font-extrabold text-[hsl(var(--ticket-orange))] tracking-tight tabular-nums"
+                className="flex items-center justify-center gap-[0.04em] text-[clamp(2.45rem,10.5vw,3.5rem)] leading-none font-extrabold text-[#ff0000] tracking-tight tabular-nums"
               >
                 <RollingTimeUnit
                   previousValue={displayTime.previousMm}
@@ -347,10 +350,10 @@ const BookingDetails = ({ ticketRecord, onEdit }: BookingDetailsProps) => {
                 />
               </p>
               <p className="text-[clamp(0.72rem,2.6vw,0.84rem)] text-white/80 mt-[clamp(0.35rem,1.4vw,0.55rem)]">Ticket Booking Date & Time</p>
-              <p className="text-[clamp(1.3rem,4.8vw,1.6rem)] leading-tight font-bold text-[hsl(var(--ticket-amber))] mt-[clamp(0.28rem,1.2vw,0.45rem)]">
-                {bookedOn}
+              <p className="text-[clamp(1.3rem,4.8vw,1.6rem)] leading-tight font-bold text-[#f5a623] mt-[clamp(0.28rem,1.2vw,0.45rem)]">
+                {bookedOnDisplay}
               </p>
-              <p className="text-[clamp(0.62rem,2vw,0.72rem)] text-white/70 mt-[clamp(0.3rem,1.2vw,0.45rem)]">R13731</p>
+              <p className="text-[clamp(0.62rem,2vw,0.72rem)] text-white/70 mt-[clamp(0.3rem,1.2vw,0.45rem)]">R17979</p>
               <p className="text-[clamp(0.76rem,2.8vw,0.88rem)] text-white/90">Ticket is Non-Transferable</p>
             </div>
           </div>
@@ -364,27 +367,32 @@ const BookingDetails = ({ ticketRecord, onEdit }: BookingDetailsProps) => {
           {/* White ticket body */}
           <div className="bg-white relative">
             {/* TOP SECTION */}
-            <div className="px-[clamp(0.8rem,3vw,1.2rem)] pt-[clamp(0.9rem,3.3vw,1.2rem)] pb-[clamp(0.6rem,2.1vw,0.85rem)] space-y-[clamp(0.72rem,2.7vw,1rem)]">
-              <div className="flex items-start justify-between gap-[clamp(0.6rem,2.2vw,0.85rem)]">
-                <h3 className="text-[clamp(0.96rem,3.4vw,1.08rem)] font-bold text-foreground"><EditableField field="ticketType" value={editableText.ticketType} /></h3>
-                <div className="text-[clamp(0.8rem,2.9vw,0.92rem)] font-bold text-foreground"><EditableField field="ticketCode" value={editableText.ticketCode} /></div>
+            <div className="px-[clamp(0.8rem,3vw,1.2rem)] pt-[clamp(0.9rem,3.3vw,1.2rem)] pb-[clamp(0.6rem,2.1vw,0.85rem)] space-y-[clamp(0.55rem,2vw,0.78rem)]">
+              {/* Season Ticket + Code + ACTIVE badge */}
+              <div className="flex items-start justify-between gap-[clamp(0.4rem,1.5vw,0.6rem)]">
+                <div>
+                  <p className="text-[clamp(0.68rem,2.3vw,0.78rem)] text-muted-foreground">Season Ticket</p>
+                  <h3 className="text-[clamp(0.88rem,3.2vw,1.04rem)] font-bold text-foreground leading-tight"><EditableField field="ticketCode" value={editableText.ticketCode} /></h3>
+                </div>
+                <span className="inline-flex items-center gap-[clamp(0.2rem,0.7vw,0.28rem)] rounded-full border border-[#22c55e]/40 bg-[#f0fdf4] px-[clamp(0.5rem,1.8vw,0.7rem)] py-[clamp(0.15rem,0.5vw,0.22rem)] text-[clamp(0.62rem,2.1vw,0.72rem)] font-semibold text-[#16a34a] mt-[clamp(0.15rem,0.5vw,0.25rem)]">
+                  <span className="w-[clamp(0.3rem,1vw,0.38rem)] h-[clamp(0.3rem,1vw,0.38rem)] rounded-full bg-[#22c55e]" />
+                  ACTIVE
+                </span>
               </div>
 
-              <div className="flex items-center justify-between gap-[clamp(0.75rem,3vw,1.1rem)] px-[clamp(0.2rem,1vw,0.35rem)]">
+              {/* Source / Destination */}
+              <div className="grid grid-cols-2 gap-y-[clamp(0.12rem,0.5vw,0.2rem)]">
+                <p className="text-[clamp(0.68rem,2.3vw,0.78rem)] text-muted-foreground">Source</p>
+                <p className="text-[clamp(0.68rem,2.3vw,0.78rem)] text-muted-foreground text-right">Destination</p>
                 <div
                   style={isEditMode ? {
                     transform: `translate(${positions['source'] ? positions['source'].x : 0}px, ${positions['source'] ? positions['source'].y : 0}px)`,
                     cursor: 'grab',
                   } : {}}
                   onMouseDown={(e) => isEditMode && handleMouseDown('source', e)}
-                  className={`text-[clamp(0.95rem,3.6vw,1.18rem)] font-bold leading-none tracking-tight ${isEditMode ? 'bg-yellow-100/20 px-2 py-1 rounded' : ''}`}
+                  className={`text-[clamp(0.88rem,3.2vw,1.04rem)] font-bold leading-tight tracking-tight text-foreground ${isEditMode ? 'bg-yellow-100/20 px-2 py-1 rounded' : ''}`}
                 >
                   {passenger.source}
-                </div>
-                <div className="flex items-center gap-0">
-                  <span className="w-[clamp(0.65rem,2.5vw,1rem)] h-[clamp(0.1rem,0.3vw,0.18rem)] bg-gradient-to-r from-foreground/30 to-foreground/10" />
-                  <span className="text-[clamp(0.72rem,2.5vw,0.88rem)] font-semibold text-foreground/80 px-[clamp(0.22rem,0.8vw,0.4rem)]">{passenger.distance} km</span>
-                  <span className="w-[clamp(0.65rem,2.5vw,1rem)] h-[clamp(0.1rem,0.3vw,0.18rem)] bg-gradient-to-l from-foreground/30 to-foreground/10" />
                 </div>
                 <div
                   style={isEditMode ? {
@@ -392,29 +400,49 @@ const BookingDetails = ({ ticketRecord, onEdit }: BookingDetailsProps) => {
                     cursor: 'grab',
                   } : {}}
                   onMouseDown={(e) => isEditMode && handleMouseDown('destination', e)}
-                  className={`text-[clamp(0.95rem,3.6vw,1.18rem)] font-bold leading-none tracking-tight ${isEditMode ? 'bg-yellow-100/20 px-2 py-1 rounded' : ''}`}
+                  className={`text-[clamp(0.88rem,3.2vw,1.04rem)] font-bold leading-tight tracking-tight text-foreground text-right ${isEditMode ? 'bg-yellow-100/20 px-2 py-1 rounded' : ''}`}
                 >
                   {passenger.destination}
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-y-[clamp(0.25rem,1vw,0.4rem)]">
-                <p className="text-[clamp(0.72rem,2.5vw,0.84rem)] text-muted-foreground">Via</p>
-                <p className="text-[clamp(0.72rem,2.5vw,0.84rem)] text-muted-foreground text-right">Booked on</p>
-                <p className="text-[clamp(0.72rem,2.5vw,0.84rem)] text-foreground">------</p>
-                <p className="text-[clamp(0.72rem,2.5vw,0.84rem)] text-foreground text-right font-medium">{bookedOn}</p>
+              {/* Distance / Booked on */}
+              <div className="grid grid-cols-2 gap-y-[clamp(0.12rem,0.5vw,0.2rem)]">
+                <p className="text-[clamp(0.68rem,2.3vw,0.78rem)] text-muted-foreground">Distance</p>
+                <p className="text-[clamp(0.68rem,2.3vw,0.78rem)] text-muted-foreground text-right">Booked on</p>
+                <p className="text-[clamp(0.82rem,2.8vw,0.94rem)] text-foreground font-bold">{passenger.distance} km</p>
+                <p className="text-[clamp(0.72rem,2.5vw,0.84rem)] text-foreground text-right font-bold">{bookedOn}</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-y-[clamp(0.25rem,1vw,0.4rem)] pt-[clamp(0.35rem,1.2vw,0.55rem)]">
-                <p className="text-[clamp(0.72rem,2.5vw,0.84rem)] text-muted-foreground">Valid From</p>
-                <p className="text-[clamp(0.72rem,2.5vw,0.84rem)] text-muted-foreground text-right">Valid Till</p>
-                <p className="text-[clamp(0.72rem,2.5vw,0.84rem)] text-foreground font-medium">{validFrom}</p>
-                <p className="text-[clamp(0.72rem,2.5vw,0.84rem)] text-foreground text-right font-medium">{validTill}</p>
+              {/* Ticket Type / Train Types */}
+              <div className="grid grid-cols-2 gap-y-[clamp(0.12rem,0.5vw,0.2rem)]">
+                <p className="text-[clamp(0.68rem,2.3vw,0.78rem)] text-muted-foreground">Ticket Type</p>
+                <p className="text-[clamp(0.68rem,2.3vw,0.78rem)] text-muted-foreground text-right">Train Types</p>
+                <p className="text-[clamp(0.82rem,2.8vw,0.94rem)] text-foreground font-bold">MONTHLY</p>
+                <p className="text-[clamp(0.82rem,2.8vw,0.94rem)] text-foreground text-right font-bold">SUPERFAST</p>
               </div>
 
-              <p className="text-[clamp(0.74rem,2.6vw,0.88rem)] font-semibold text-foreground pt-[clamp(0.2rem,0.8vw,0.35rem)]">
-                <EditableField field="fareInfo" value={editableText.fareInfo} />
-              </p>
+              {/* Class / Fare */}
+              <div className="grid grid-cols-2 gap-y-[clamp(0.12rem,0.5vw,0.2rem)]">
+                <p className="text-[clamp(0.68rem,2.3vw,0.78rem)] text-muted-foreground">Class</p>
+                <p className="text-[clamp(0.68rem,2.3vw,0.78rem)] text-muted-foreground text-right">Fare</p>
+                <p className="text-[clamp(0.82rem,2.8vw,0.94rem)] text-foreground font-bold">SECOND</p>
+                <p className="text-[clamp(0.82rem,2.8vw,0.94rem)] text-foreground text-right font-bold">665.00</p>
+              </div>
+
+              {/* Valid From / Valid Upto */}
+              <div className="grid grid-cols-2 gap-y-[clamp(0.12rem,0.5vw,0.2rem)]">
+                <p className="text-[clamp(0.68rem,2.3vw,0.78rem)] text-muted-foreground">Valid From</p>
+                <p className="text-[clamp(0.68rem,2.3vw,0.78rem)] text-muted-foreground text-right">Valid Upto</p>
+                <p className="text-[clamp(0.82rem,2.8vw,0.94rem)] text-foreground font-bold">{validFrom}</p>
+                <p className="text-[clamp(0.82rem,2.8vw,0.94rem)] text-foreground text-right font-bold">{validTill}</p>
+              </div>
+
+              {/* Via box */}
+              <div className="rounded-[clamp(0.6rem,2.2vw,0.85rem)] border border-slate-200 bg-[#f8f9fa] px-[clamp(0.75rem,2.8vw,1rem)] py-[clamp(0.55rem,2vw,0.75rem)] flex items-center gap-[clamp(0.3rem,1vw,0.4rem)]">
+                <span className="text-[clamp(0.78rem,2.7vw,0.9rem)] text-foreground/70">✈</span>
+                <span className="text-[clamp(0.78rem,2.7vw,0.9rem)] text-foreground/80 font-medium">Via: ---</span>
+              </div>
             </div>
 
             {/* U-CUT NOTCH */}
@@ -425,17 +453,17 @@ const BookingDetails = ({ ticketRecord, onEdit }: BookingDetailsProps) => {
             {/* MIDDLE SECTION — Name / ID details */}
             <div className="px-[clamp(0.8rem,3vw,1.2rem)] pt-[clamp(0.35rem,1.2vw,0.55rem)] pb-[clamp(0.75rem,3vw,1rem)] space-y-[clamp(0.55rem,2vw,0.8rem)]">
               <div className="grid grid-cols-2 gap-x-[clamp(1rem,3.8vw,1.45rem)] gap-y-[clamp(0.2rem,0.8vw,0.35rem)]">
-                <p className="text-[clamp(0.72rem,2.5vw,0.84rem)] text-muted-foreground">Name</p>
-                <p className="text-[clamp(0.72rem,2.5vw,0.84rem)] text-muted-foreground text-right">Age</p>
-                <p className="text-[clamp(0.88rem,2.8vw,0.94rem)] text-foreground font-medium">{passenger.name}</p>
-                <p className="text-[clamp(0.88rem,2.8vw,0.94rem)] text-foreground text-right font-medium">{passenger.age} years</p>
+                <p className="text-[clamp(0.68rem,2.3vw,0.78rem)] text-muted-foreground">Name</p>
+                <p className="text-[clamp(0.68rem,2.3vw,0.78rem)] text-muted-foreground text-right">Age</p>
+                <p className="text-[clamp(0.88rem,2.8vw,0.94rem)] text-foreground font-bold">{passenger.name}</p>
+                <p className="text-[clamp(0.88rem,2.8vw,0.94rem)] text-foreground text-right font-bold">{passenger.age} years</p>
               </div>
 
               <div className="grid grid-cols-2 gap-x-[clamp(1rem,3.8vw,1.45rem)] gap-y-[clamp(0.2rem,0.8vw,0.35rem)]">
-                <p className="text-[clamp(0.72rem,2.5vw,0.84rem)] text-muted-foreground">ID Type</p>
-                <p className="text-[clamp(0.72rem,2.5vw,0.84rem)] text-muted-foreground text-right">ID Number</p>
-                <p className="text-[clamp(0.84rem,2.6vw,0.9rem)] text-foreground font-medium">{passenger.idType}</p>
-                <p className="text-[clamp(0.84rem,2.6vw,0.9rem)] text-foreground text-right font-medium">{passenger.idNumber}</p>
+                <p className="text-[clamp(0.68rem,2.3vw,0.78rem)] text-muted-foreground">ID Type*</p>
+                <p className="text-[clamp(0.68rem,2.3vw,0.78rem)] text-muted-foreground text-right">ID Number</p>
+                <p className="text-[clamp(0.84rem,2.6vw,0.9rem)] text-foreground font-bold">{passenger.idType}</p>
+                <p className="text-[clamp(0.84rem,2.6vw,0.9rem)] text-foreground text-right font-bold">{passenger.idNumber}</p>
               </div>
             </div>
           </div>
