@@ -1,4 +1,4 @@
-import { ArrowLeft, Share2, Edit2, Save } from "lucide-react";
+import { ArrowLeft, Share2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { dbService, type TicketRecord } from "@/services/dbService";
 
@@ -248,18 +248,6 @@ const BookingDetails = ({ ticketRecord, onEdit }: BookingDetailsProps) => {
               <h1 className="text-[clamp(1.3rem,4.8vw,1.9rem)] font-bold leading-tight">Booking Details</h1>
               <p className="text-[clamp(0.75rem,2.8vw,0.9rem)] text-primary-foreground/90">Mobile: 8776045632</p>
             </div>
-            <button
-              aria-label={isEditMode ? "Save" : "Edit"}
-              onClick={() => {
-                if (isEditMode) {
-                  setEditingField(null);
-                }
-                setIsEditMode(!isEditMode);
-              }}
-              className="w-[clamp(2rem,8vw,2.5rem)] h-[clamp(2rem,8vw,2.5rem)] rounded-full border border-primary-foreground/80 flex items-center justify-center hover:bg-primary-foreground/10 transition flex-shrink-0"
-            >
-              {isEditMode ? <Save className="w-[clamp(1.2rem,4vw,1.4rem)] h-[clamp(1.2rem,4vw,1.4rem)]" /> : <Edit2 className="w-[clamp(1.2rem,4vw,1.4rem)] h-[clamp(1.2rem,4vw,1.4rem)]" />}
-            </button>
             <button aria-label="Share" className="p-[clamp(0.4rem,1.5vw,0.6rem)] flex-shrink-0">
               <Share2 className="w-[clamp(1.2rem,4vw,1.4rem)] h-[clamp(1.2rem,4vw,1.4rem)]" />
             </button>
