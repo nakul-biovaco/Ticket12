@@ -427,9 +427,22 @@ const BookingDetails = ({ ticketRecord, onEdit }: BookingDetailsProps) => {
               </div>
 
               {/* Via box */}
-              <div className="rounded-[clamp(0.6rem,2.2vw,0.85rem)] border border-slate-200 bg-[#f8f9fa] px-[clamp(0.75rem,2.8vw,1rem)] py-[clamp(0.55rem,2vw,0.75rem)] flex items-center gap-[clamp(0.3rem,1vw,0.4rem)]">
-                <span className="text-[clamp(0.78rem,2.7vw,0.9rem)] text-foreground/70">✈</span>
-                <span className="text-[clamp(0.78rem,2.7vw,0.9rem)] text-foreground/80 font-medium">Via: ---</span>
+              <div className="rounded-[clamp(0.5rem,1.8vw,0.75rem)] border border-slate-200/80 bg-[#f8f9fa] px-[clamp(0.6rem,2.2vw,0.85rem)] py-[clamp(0.45rem,1.6vw,0.65rem)] flex items-center gap-[clamp(0.35rem,1.2vw,0.5rem)]">
+                <svg
+                  className="w-[clamp(1rem,3.4vw,1.25rem)] h-[clamp(0.75rem,2.5vw,0.95rem)] text-muted-foreground flex-shrink-0"
+                  viewBox="0 0 22 16"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M2 8h5c2.5 0 4.5-5 8.5-5" />
+                  <path d="M7 8c2.5 0 4.5 5 8.5 5" />
+                  <circle cx="17.5" cy="3" r="1.75" fill="currentColor" />
+                  <circle cx="17.5" cy="13" r="1.75" fill="currentColor" />
+                </svg>
+                <span className="text-[clamp(0.78rem,2.7vw,0.9rem)] text-foreground font-semibold">Via: ---</span>
               </div>
             </div>
 
